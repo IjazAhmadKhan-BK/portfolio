@@ -17,8 +17,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Custom Cursor
     const cursor = document.querySelector('.custom-cursor');
     const cursorTrail = document.querySelector('.cursor-trail');
+    const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
     
-    if (cursor && cursorTrail) {
+    if (cursor && cursorTrail && !isTouchDevice) {
         document.addEventListener('mousemove', (e) => {
             cursor.style.left = e.clientX + 'px';
             cursor.style.top = e.clientY + 'px';
@@ -38,6 +39,30 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             el.addEventListener('mouseleave', () => {
                 cursor.classList.remove('hovering');
+            });
+        });
+    }
+
+    // Mobile Menu Toggle
+    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+    const navLinks = document.querySelector('.nav-links');
+    
+    if (mobileMenuBtn && navLinks) {
+        mobileMenuBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            if (navLinks.classList.contains('active')) {
+                mobileMenuBtn.innerHTML = '✕';
+                mobileMenuBtn.style.transform = 'rotate(180deg)';
+            } else {
+                mobileMenuBtn.innerHTML = '☰';
+                mobileMenuBtn.style.transform = 'rotate(0deg)';
+            }
+        });
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+                mobileMenuBtn.innerHTML = '☰';
+                mobileMenuBtn.style.transform = 'rotate(0deg)';
             });
         });
     }
@@ -87,6 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const cards = document.querySelectorAll('.glass-card');
     cards.forEach(card => {
         card.addEventListener('mousemove', (e) => {
+            if (window.innerWidth <= 768) return; // Disable tilt on mobile
             const rect = card.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
@@ -116,7 +142,8 @@ document.addEventListener('DOMContentLoaded', () => {
         let width = canvas.width = window.innerWidth;
         let height = canvas.height = window.innerHeight;
         let particles = [];
-        const numParticles = 250; // Heavy number of particles
+        // Reduce particles heavily on mobile for performance
+        const numParticles = window.innerWidth < 768 ? 50 : 250;
 
         window.addEventListener('resize', () => {
             width = canvas.width = window.innerWidth;
